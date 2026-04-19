@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="21.1.2">
+  <diagram name="System Performance Dashboard" id="fig-7-1">
+    <mxGraphModel dx="1200" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="SPARK OS Dashboard Mockup" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;fontColor=#ffffff;strokeColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="600" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Real-time Status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2d2d2d;fontColor=#4dff88;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="60" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Intrusion Alerts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2d2d2d;fontColor=#ff4d4d;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="180" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Environmental Telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2d2d2d;fontColor=#4d94ff;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="60" width="360" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="System Log Feed (Terminal Style)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#00ff00;fontFamily=Courier New;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="300" width="560" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Temp: 24°C&#xa;Hum: 45%" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="400" y="140" width="160" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

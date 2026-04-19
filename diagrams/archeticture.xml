@@ -1,0 +1,69 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0" version="28.2.5">
+  <diagram name="System Architecture" id="0">
+    <mxGraphModel dx="240734" dy="163330" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="2" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2" value="DHT11 Sensor" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-1130" y="-160" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="3" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="PIR Sensor" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-1130" y="-80" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="4" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Door Sensor" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-1130" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="5" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="5" target="9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#E07A5F;fontColor=default;fillColor=#F2CC8F;labelBackgroundColor=none;" edge="1" parent="1" source="5" target="10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="ESP32 Controller" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-930" y="-85" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="WiFi Module" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-730" y="-85" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fOJv35Gm8qYhuAETENTZ-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" edge="1" parent="1" source="7" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="MQTT Cloud Server" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-560" y="-85" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="User Dashboard (Mobile/Web)" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-360" y="-85" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Relay Module (Light/Fan)" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-945" y="40" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Buzzer and LED Alerts" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" parent="1" vertex="1">
+          <mxGeometry x="-720" y="40" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="11" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="2" target="5" edge="1" />
+        <mxCell id="12" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="3" target="5" edge="1" />
+        <mxCell id="13" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="4" target="5" edge="1" />
+        <mxCell id="14" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="5" target="6" edge="1" />
+        <mxCell id="15" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="6" target="7" edge="1" />
+        <mxCell id="16" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="7" target="8" edge="1" />
+        <mxCell id="17" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="5" target="9" edge="1" />
+        <mxCell id="18" style="labelBackgroundColor=none;fontColor=default;strokeColor=#E07A5F;" parent="1" source="5" target="10" edge="1" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

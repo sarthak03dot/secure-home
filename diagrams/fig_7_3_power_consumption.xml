@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Antigravity" version="21.1.2">
+  <diagram name="Power Consumption Graph" id="fig-7-3">
+    <mxGraphModel dx="1200" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="ESP32 Power Consumption Analysis (Current mA)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="400" height="30" as="geometry" />
+        </mxCell>
+        <!-- Axes -->
+        <mxCell id="3" value="" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120" y="360" as="sourcePoint" />
+            <mxPoint x="120" y="80" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4" value="" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120" y="360" as="sourcePoint" />
+            <mxPoint x="600" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Labels -->
+        <mxCell id="5" value="Current (mA)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="50" y="200" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Time / Operation Mode" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="300" y="380" width="160" height="30" as="geometry" />
+        </mxCell>
+        <!-- Bars -->
+        <mxCell id="7" value="Deep Sleep&#xa;(10µA)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="140" y="350" width="60" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Active (Idle)&#xa;(80mA)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="240" y="280" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="WiFi TX&#xa;(160mA)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="340" y="200" width="60" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Relay (Both ON)&#xa;(240mA)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ff3333;fontColor=#ffffff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="440" y="120" width="60" height="240" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

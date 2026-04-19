@@ -1,0 +1,64 @@
+# Node.js
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.npm
+.eslintcache
+.stylelintcache
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firmware (ESP32)
+**/firmware/**/build/
+**/firmware/**/sdkconfig
+**/firmware/**/*.bin
+**/firmware/**/*.elf
+**/firmware/**/*.o
+**/firmware/**/*.d
+**/firmware/**/.pio/
+**/firmware/**/libdeps/
+
+# Mobile (securehome - React Native/Expo)
+**/android/.gradle/
+**/android/app/build/
+**/android/local.properties
+**/ios/build/
+**/ios/Pods/
+**/ios/DerivedData/
+**/securehome/**/.bundle/
+**/securehome/**/.expo/
+**/securehome/**/web-build/
+**/securehome/**/*.jks
+**/securehome/**/*.p8
+**/securehome/**/*.p12
+**/securehome/**/*.key
+**/securehome/**/*.mobileprovision
+
+# Project Specific
+diagrams/*.xml.bak
