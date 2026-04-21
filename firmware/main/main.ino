@@ -1,3 +1,4 @@
+
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WebServer.h>
@@ -32,6 +33,8 @@ int distance;
 int lightValue;
 bool motion;
 
+int threshold = 1500;
+
 // ===== SENSOR READ =====
 void readSensors() {
   static unsigned long motionTimer = 0;
@@ -45,6 +48,7 @@ void readSensors() {
     motion = false;
   }
 
+  // LDR
   lightValue = analogRead(LDR);
 
   // ULTRASONIC
@@ -55,6 +59,7 @@ void readSensors() {
   digitalWrite(TRIG, LOW);
 
   duration = pulseIn(ECHO, HIGH, 30000);
+
   static int lastDistance = 0;
 
   if (duration != 0) {
@@ -63,7 +68,6 @@ void readSensors() {
     if (rawDistance > 300) rawDistance = 300;
     if (rawDistance < 2) rawDistance = 0;
 
-    // smooth value
     distance = (lastDistance + rawDistance) / 2;
     lastDistance = distance;
   }
@@ -82,24 +86,45 @@ void automation() {
 
   bool trigger = isTriggered();
 
-  // 💡 LIGHT CONTROL
+  // ===== LDR FILTER =====
+  static int filteredLight = 0;
+  filteredLight = (filteredLight * 3 + lightValue) / 4;
+
+  int darkThreshold = threshold;
+  int lightThreshold = threshold + 500;
+
+  static bool isDark = false;
+
+  // if (filteredLight < darkThreshold) {
+  //   isDark = true;
+  // } 
+  // else if (filteredLight > lightThreshold) {
+  //   isDark = false;
+  // }
+  if (filteredLight > darkThreshold) {
+    isDark = true;
+  } 
+  else if (filteredLight < lightThreshold) {
+    isDark = false;
+  }
+  // 💡 LIGHT (ONLY LDR BASED)
   if (!manualLight) {
-    relayLight = trigger && (lightValue < 1500);
+    relayLight = isDark;
   }
 
-  // 🌀 FAN CONTROL
+  // 🌀 FAN (trigger based)
   if (!manualFan) {
     relayFan = trigger;
   }
 
-  // APPLY OUTPUTS
+  // OUTPUT
   digitalWrite(RELAY1, relayLight ? LOW : HIGH);
   digitalWrite(RELAY2, relayFan ? LOW : HIGH);
 
   digitalWrite(LED_LIGHT, relayLight ? HIGH : LOW);
   digitalWrite(LED_FAN, relayFan ? HIGH : LOW);
 
-  // 🔔 BUZZER
+  // BUZZER
   static unsigned long buzzTimer = 0;
   static bool buzzState = false;
 
@@ -124,7 +149,7 @@ void handleData() {
   json += "\"motion\":" + String(motion ? "true" : "false") + ",";
   json += "\"light\":" + String(lightValue) + ",";
   json += "\"distance\":" + String(distance) + ",";
-  json += "\"relay_light\":" + String(relayLight ? "true" : "false") + ",";
+  json += "\"relay_light\":" + String(relayLight ? "false" : "true") + ",";
   json += "\"relay_fan\":" + String(relayFan ? "true" : "false") + ",";
   json += "\"mode\":\"" + detectMode + "\",";
   json += "\"uptime\":" + String(millis() / 1000);
@@ -148,7 +173,6 @@ void handleRelay() {
     relayFan = (server.arg("fan") == "on");
   }
 
-  // 🔄 RESET TO AUTO
   if (server.hasArg("auto")) {
     manualLight = false;
     manualFan = false;
@@ -187,7 +211,7 @@ void setup() {
   digitalWrite(LED_FAN, LOW);
   digitalWrite(LED_LIGHT, LOW);
 
-  // 🔌 Connect WiFi
+  // WiFi
   WiFi.begin(ssid, password);
 
   Serial.print("Connecting...");
@@ -198,19 +222,15 @@ void setup() {
 
   Serial.println("\n✅ WiFi Connected");
 
-  // 🌐 Start mDNS (ONLY ONCE, AFTER WIFI)
   if (!MDNS.begin("secure-home")) {
     Serial.println("❌ mDNS failed");
   } else {
-    Serial.println("✅ mDNS started");
     Serial.println("🌐 http://secure-home.local");
   }
 
-  // Show IP as backup
-  Serial.print("🌐 IP: ");
+  Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  // 🌍 API routes
   server.on("/data", handleData);
   server.on("/relay", handleRelay);
   server.on("/mode", handleMode);

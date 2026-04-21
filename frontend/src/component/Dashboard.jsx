@@ -48,7 +48,7 @@ const SensorCard = ({ title, status, icon: Icon, colorClass, isActive, value, su
   </div>
 );
 
-export default function Dashboard({ espIp, setIsConnected }) {
+export default function Dashboard({ espIp, isConnected, setIsConnected }) {
   const [data, setData] = useState({
     motion: false,
     light: 0,
@@ -113,10 +113,15 @@ export default function Dashboard({ espIp, setIsConnected }) {
       clearTimeout(timeoutId);
 
       // Support for both wrapped {status, data} and direct root-level data
-      const newData = json.status === "success" ? json.data : 
+      let newData = json.status === "success" ? json.data : 
                      (json.motion !== undefined ? json : null);
 
       if (newData) {
+        // FIX: Invert relay_light because firmware sends it inverted
+        if (newData.relay_light !== undefined) {
+          newData.relay_light = !newData.relay_light;
+        }
+
         setData(prev => {
           if (newData.motion !== prev.motion) addLog("MOTION", newData.motion ? "DETECTED" : "CLEAR");
           if (Math.abs(newData.distance - prev.distance) > 5) addLog("RANGE", `${newData.distance}cm`);
@@ -169,12 +174,14 @@ export default function Dashboard({ espIp, setIsConnected }) {
   // Manual Color Mapping for Tailwind 4 class compatibility
   const getMotionColor = () => data.motion ? 'vanta-ruby' : 'vanta-slate';
   const getProxColor = () => isProximityAlert ? 'vanta-ruby' : 'vanta-slate';
-  const getLightColor = () => data.light < 1000 ? 'vanta-emerald' : 'vanta-slate';
+  // Align with firmware threshold: Higher than 1500 is DARK (Inverted LDR)
+  const isLightPresent = data.light < 1500;
+  const getLightColor = () => isLightPresent ? 'vanta-emerald' : 'vanta-slate';
 
   // Radar Proximity Mapping: Only show if within Trigger Zone (<40cm)
   const getRadarProximityPos = () => {
     if (!isProximityAlert) return null;
-    const radius = 112; // 56 * 2 (approximate visual radius in pixels)
+    const radius = 112; 
     const factor = data.distance / 200;
     return {
         bottom: `${25 + (factor * 50)}%`,
@@ -190,23 +197,23 @@ export default function Dashboard({ espIp, setIsConnected }) {
       <div className="col-span-12 xl:col-span-3 space-y-4 sm:space-y-8 order-2 xl:order-1">
         <div className={`vanta-panel p-6 sm:p-8 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[420px] transition-all duration-700 ${ (data.motion || isProximityAlert) ? 'animate-danger-pulse border-vanta-ruby/50' : 'border-white/5' }`}>
           <div className="w-full flex justify-between items-center mb-10">
-            <h3 className={`text-[9px] font-black uppercase tracking-[0.4em] font-mono transition-colors ${(data.motion || isProximityAlert) ? 'text-vanta-ruby' : 'text-slate-500'}`}>
+            <h3 className={`text-[9px] font-black uppercase tracking-[0.4em] font-mono transition-colors ${(data.motion || isProximityAlert) ? 'text-vanta-ruby' : 'text-[var(--text-muted)]'}`}>
               {(data.motion || isProximityAlert) ? 'SECURITY ALERT' : 'RADAR'}
             </h3>
-            <div className={`px-2 py-0.5 rounded border text-[8px] font-bold font-mono transition-colors ${ (data.motion || isProximityAlert) ? 'border-vanta-ruby/50 text-vanta-ruby bg-vanta-ruby/10' : (data.mode !== 'off' ? 'border-vanta-violet/50 text-vanta-violet bg-vanta-violet/5' : 'border-white/5 text-slate-600') }`}>
+            <div className={`px-2 py-0.5 rounded border text-[8px] font-bold font-mono transition-colors ${ (data.motion || isProximityAlert) ? 'border-vanta-ruby/50 text-vanta-ruby bg-vanta-ruby/10' : (data.mode !== 'off' ? 'border-vanta-violet/50 text-vanta-violet bg-vanta-violet/5' : 'border-black/5 text-[var(--text-muted)]') }`}>
               {(data.motion || isProximityAlert) ? 'ALERT' : `MOD:${data.mode.toUpperCase()}`}
             </div>
           </div>
 
           <div className="relative group cursor-crosshair scale-90 sm:scale-100">
-            <div className={`w-48 h-48 sm:w-56 sm:h-56 border rounded-full flex items-center justify-center relative overflow-hidden bg-black/20 transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/30' : 'border-white/5'}`}>
+            <div className={`w-48 h-48 sm:w-56 sm:h-56 border rounded-full flex items-center justify-center relative overflow-hidden bg-black/5 transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/30' : 'border-black/5'}`}>
                {/* Radial Grid Lines */}
-               <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] opacity-40" />
+               <div className="absolute inset-0 bg-[radial-gradient(circle,var(--vanta-violet)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10" />
                
                {/* Fixed Rings */}
-               <div className={`absolute w-full h-full border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-white/5'}`} />
-               <div className={`absolute w-2/3 h-2/3 border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-white/5'}`} />
-               <div className={`absolute w-1/3 h-1/3 border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-white/5'}`} />
+               <div className={`absolute w-full h-full border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-black/5'}`} />
+               <div className={`absolute w-2/3 h-2/3 border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-black/5'}`} />
+               <div className={`absolute w-1/3 h-1/3 border rounded-full transition-colors ${(data.motion || isProximityAlert) ? 'border-vanta-ruby/20' : 'border-black/5'}`} />
 
                <div className={`w-2 h-2 rounded-full z-10 transition-all duration-500 ${(data.motion || isProximityAlert) ? 'bg-vanta-ruby shadow-[0_0_20px_#ef4444]' : 'bg-vanta-violet shadow-[0_0_20px_#8b5cf6]'}`} />
             </div>
@@ -216,7 +223,7 @@ export default function Dashboard({ espIp, setIsConnected }) {
               <div className={`w-1/2 h-1/2 bg-gradient-to-tr border-t rounded-tl-full origin-bottom-right transition-all duration-700 ${(data.motion || isProximityAlert) ? 'from-vanta-ruby/40 to-transparent border-vanta-ruby/50' : 'from-vanta-violet/40 to-transparent border-vanta-violet/50'}`} />
             </div>
 
-            {/* Dynamic Entity Markers based on mode */}
+            {/* Dynamic Entity Markers */}
             {((data.mode === 'pir' || data.mode === 'both') && data.motion) && (
               <div className="absolute top-1/4 right-[20%] w-3 h-3 bg-vanta-ruby rounded-full shadow-[0_0_20px_#ef4444] animate-ping z-20" />
             )}
@@ -230,32 +237,32 @@ export default function Dashboard({ espIp, setIsConnected }) {
           </div>
 
           <div className="mt-10 sm:mt-12 grid grid-cols-2 gap-3 sm:gap-4 w-full">
-            <div className="bg-vanta-black/40 p-3 sm:p-4 rounded-lg border border-white/5 text-center group transition-all hover:border-vanta-violet/30">
-              <p className="text-[7px] text-slate-500 uppercase font-bold tracking-[0.3em] mb-1 group-hover:text-vanta-violet transition-colors">LATENCY</p>
-              <p className="text-xs font-mono text-white font-black italic">± 12ms</p>
+            <div className="bg-vanta-slate p-3 sm:p-4 rounded-lg border border-black/5 text-center group transition-all hover:border-vanta-violet/30">
+              <p className="text-[7px] text-[var(--text-muted)] uppercase font-bold tracking-[0.3em] mb-1 group-hover:text-vanta-violet transition-colors">LATENCY</p>
+              <p className="text-xs font-mono font-black italic">± 12ms</p>
             </div>
-            <div className="bg-vanta-black/40 p-3 sm:p-4 rounded-lg border border-white/5 text-center transition-all hover:border-vanta-emerald/30">
-              <p className="text-[7px] text-slate-500 uppercase font-bold tracking-[0.3em] mb-1">UPTIME</p>
-              <p className="text-xs font-mono text-white font-black italic">{Math.floor(data.uptime / 60)}m</p>
+            <div className="bg-vanta-slate p-3 sm:p-4 rounded-lg border border-black/5 text-center transition-all hover:border-vanta-emerald/30">
+              <p className="text-[7px] text-[var(--text-muted)] uppercase font-bold tracking-[0.3em] mb-1">UPTIME</p>
+              <p className="text-xs font-mono font-black italic">{Math.floor(data.uptime / 60)}m</p>
             </div>
           </div>
         </div>
 
-        {/* Encrypted Feed - Responsive height */}
-        <div className="vanta-panel h-[280px] sm:h-[340px] flex flex-col overflow-hidden border-vanta-violet/10">
-          <div className="p-4 border-b border-white/5 flex gap-3 items-center bg-vanta-violet/5">
+        {/* Activity Logs */}
+        <div className="vanta-panel h-[280px] sm:h-[340px] flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-black/5 flex gap-3 items-center bg-vanta-violet/5">
             <Terminal className="w-3 h-3 text-vanta-violet" />
             <span className="text-[9px] font-black text-vanta-violet uppercase tracking-[0.4em] font-mono italic whitespace-nowrap">ACTIVITY LOGS</span>
           </div>
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 font-mono text-[8px] sm:text-[9px]">
             {logs.length === 0 ? (
-              <p className="text-slate-600 italic animate-pulse">Syncing nodes...</p>
+              <p className="text-[var(--text-muted)] italic animate-pulse">Syncing nodes...</p>
             ) : (
               logs.map((log) => (
-                <div key={log.id} className="flex gap-3 border-l-2 border-vanta-violet/20 pl-3 py-1.5 hover:border-vanta-violet/50 transition-colors bg-white/[0.01]">
-                  <span className="text-slate-600 shrink-0">[{log.timestamp}]</span>
+                <div key={log.id} className="flex gap-3 border-l-2 border-vanta-violet/20 pl-3 py-1.5 hover:border-vanta-violet/50 transition-colors">
+                  <span className="text-[var(--text-muted)] shrink-0">[{log.timestamp}]</span>
                   <span className="text-vanta-violet font-bold uppercase tracking-tighter shrink-0">{log.type}</span>
-                  <span className="text-slate-400 truncate opacity-80">{log.value}</span>
+                  <span className="text-[var(--text-main)] truncate opacity-80">{log.value}</span>
                 </div>
               ))
             )}
@@ -265,25 +272,25 @@ export default function Dashboard({ espIp, setIsConnected }) {
 
       {/* Main Grid */}
       <div className="col-span-12 xl:col-span-9 space-y-4 sm:space-y-8 order-1 xl:order-2">
-        {/* Tactical Interaction Hub */}
-        <div className="vanta-panel vanta-panel-tactical p-6 sm:p-10 border-white/10 relative overflow-hidden">
+        {/* Interaction Hub */}
+        <div className="vanta-panel p-6 sm:p-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-vanta-violet/5 blur-[120px] -mr-32 -mt-32 pointer-events-none" />
           
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6 relative z-10">
             <div>
               <div className="flex items-center gap-3">
                 <Zap className="w-5 h-5 text-vanta-violet" />
-                <h2 className="text-xl sm:text-2xl font-black text-white italic tracking-[0.1em] uppercase">SYSTEM CONTROLS</h2>
+                <h2 className="text-xl sm:text-2xl font-black italic tracking-[0.1em] uppercase">SYSTEM CONTROLS</h2>
               </div>
-              <p className="text-slate-500 text-[9px] font-mono mt-1 sm:mt-2 tracking-[0.3em] uppercase">Manual Hardware Override</p>
+              <p className="text-[var(--text-muted)] text-[9px] font-mono mt-1 sm:mt-2 tracking-[0.3em] uppercase">Manual Hardware Override</p>
             </div>
 
-            <div className="grid grid-cols-2 sm:flex bg-vanta-black/60 p-1 rounded-lg border border-white/5 w-full lg:w-auto">
+            <div className="grid grid-cols-2 sm:flex bg-vanta-black/20 p-1 rounded-lg border border-black/5 w-full lg:w-auto">
               {['pir', 'ultra', 'both', 'off'].map((m) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`px-4 sm:px-6 py-3 sm:py-2.5 rounded-md text-[9px] font-black uppercase tracking-[0.2em] transition-all font-mono ${data.mode === m ? 'bg-vanta-violet text-white shadow-lg shadow-vanta-violet/30' : 'text-slate-600 hover:text-slate-400'}`}
+                  className={`px-4 sm:px-6 py-3 sm:py-2.5 rounded-md text-[9px] font-black uppercase tracking-[0.2em] transition-all font-mono ${data.mode === m ? 'bg-vanta-violet text-white shadow-lg shadow-vanta-violet/30' : 'text-[var(--text-muted)] hover:text-vanta-violet'}`}
                 >
                   {m}
                 </button>
@@ -293,32 +300,32 @@ export default function Dashboard({ espIp, setIsConnected }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 relative z-10">
             {/* Lights */}
-            <div className={`vanta-panel vanta-panel-tactical p-6 sm:p-8 group transition-all duration-700 border-2 ${data.relay_light ? 'border-vanta-amber/60 bg-vanta-amber/10 neon-glow-amber' : 'border-white/5 hover:border-white/10'}`}>
+            <div className={`vanta-panel p-6 sm:p-8 group transition-all duration-700 border-2 ${data.relay_light ? 'border-vanta-amber/60 bg-vanta-amber/5 neon-glow-amber' : 'border-black/5 hover:border-black/10'}`}>
               <div className="flex justify-between items-center mb-8 sm:mb-10 relative">
-                <div className={`p-4 rounded-lg border transition-all duration-700 ${data.relay_light ? 'bg-vanta-amber/20 border-vanta-amber/40 text-vanta-amber shadow-[0_0_20px_rgba(245,158,11,0.3)]' : 'bg-vanta-slate border-white/5 text-slate-600'}`}>
+                <div className={`p-4 rounded-lg border transition-all duration-700 ${data.relay_light ? 'bg-vanta-amber/20 border-vanta-amber/40 text-vanta-amber shadow-[0_0_20px_rgba(245,158,11,0.3)]' : 'bg-vanta-slate border-black/5 text-[var(--text-muted)]'}`}>
                   <Lightbulb className={`w-7 h-7 sm:w-8 sm:h-8 ${data.relay_light ? 'animate-pulse' : ''}`} />
                 </div>
-                <div className={`flex items-center gap-3 px-4 py-2 rounded-md border font-mono transition-all ${data.relay_light ? 'bg-vanta-amber/10 border-vanta-amber/30 text-vanta-amber' : 'bg-vanta-black/40 border-white/5 text-slate-600'}`}>
+                <div className={`flex items-center gap-3 px-4 py-2 rounded-md border font-mono transition-all ${data.relay_light ? 'bg-vanta-amber/10 border-vanta-amber/30 text-vanta-amber' : 'bg-vanta-black/20 border-black/5 text-[var(--text-muted)]'}`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${data.relay_light ? 'bg-vanta-amber shadow-[0_0_10px_#f59e0b]' : 'bg-slate-800'}`} />
                   <span className="text-[8px] sm:text-[9px] font-black tracking-widest uppercase">{data.relay_light ? 'LIT' : 'IDLE'}</span>
                 </div>
               </div>
 
               <div className="mb-8 sm:mb-10 relative">
-                <h3 className="text-lg sm:text-xl font-black text-white mb-1 uppercase italic tracking-widest">LIGHTS</h3>
-                <p className="text-slate-500 text-[9px] font-mono uppercase tracking-[0.2em]">Main Room Illumination</p>
+                <h3 className="text-lg sm:text-xl font-black mb-1 uppercase italic tracking-widest">LIGHTS</h3>
+                <p className="text-[var(--text-muted)] text-[9px] font-mono uppercase tracking-[0.2em]">Main Room Illumination</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 relative">
                 <button
                   onClick={() => toggleDevice('light', data.relay_light ? 'auto' : 'on')}
-                  className={`py-4 rounded-md font-black uppercase text-[10px] tracking-widest transition-all font-mono border ${data.relay_light ? 'bg-vanta-amber text-white border-vanta-amber shadow-[0_0_25px_rgba(245,158,11,0.5)]' : 'bg-white/5 text-slate-400 hover:bg-white/10 border-white/5'}`}
+                  className={`py-4 rounded-md font-black uppercase text-[10px] tracking-widest transition-all font-mono border ${data.relay_light ? 'bg-vanta-amber text-white border-vanta-amber shadow-[0_0_25px_rgba(245,158,11,0.5)]' : 'vanta-button hover:text-vanta-amber hover:border-vanta-amber/30'}`}
                 >
                   {data.relay_light ? 'AUTO_MODE' : 'FORCE_ON'}
                 </button>
                 <button
                   onClick={() => toggleDevice('light', 'off')}
-                  className={`py-4 vanta-button font-mono text-slate-500 border border-white/5 hover:border-vanta-ruby/30 hover:text-vanta-ruby transition-all ${!data.relay_light ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  className={`py-4 vanta-button font-mono text-[var(--text-muted)] hover:border-vanta-ruby/30 hover:text-vanta-ruby transition-all ${!data.relay_light ? 'opacity-30 cursor-not-allowed' : ''}`}
                   disabled={!data.relay_light}
                 >
                   HALT
@@ -327,32 +334,32 @@ export default function Dashboard({ espIp, setIsConnected }) {
             </div>
 
             {/* Fan */}
-            <div className={`vanta-panel vanta-panel-tactical p-6 sm:p-8 group transition-all duration-700 border-2 ${data.relay_fan ? 'border-vanta-emerald/60 bg-vanta-emerald/10 neon-glow-emerald' : 'border-white/5 hover:border-white/10'}`}>
+            <div className={`vanta-panel p-6 sm:p-8 group transition-all duration-700 border-2 ${data.relay_fan ? 'border-vanta-emerald/60 bg-vanta-emerald/5 neon-glow-emerald' : 'border-black/5 hover:border-black/10'}`}>
               <div className="flex justify-between items-center mb-8 sm:mb-10 relative">
-                <div className={`p-4 rounded-lg border transition-all duration-700 ${data.relay_fan ? 'bg-vanta-emerald/20 border-vanta-emerald/40 text-vanta-emerald shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-vanta-slate border-white/5 text-slate-600'}`}>
+                <div className={`p-4 rounded-lg border transition-all duration-700 ${data.relay_fan ? 'bg-vanta-emerald/20 border-vanta-emerald/40 text-vanta-emerald shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-vanta-slate border-black/5 text-[var(--text-muted)]'}`}>
                   <Wind className={`w-7 h-7 sm:w-8 sm:h-8 ${data.relay_fan ? 'animate-[spin_1.5s_linear_infinite]' : ''}`} />
                 </div>
-                <div className={`flex items-center gap-3 px-4 py-2 rounded-md border font-mono transition-all ${data.relay_fan ? 'bg-vanta-emerald/10 border-vanta-emerald/30 text-vanta-emerald' : 'bg-vanta-black/40 border-white/5 text-slate-600'}`}>
+                <div className={`flex items-center gap-3 px-4 py-2 rounded-md border font-mono transition-all ${data.relay_fan ? 'bg-vanta-emerald/10 border-vanta-emerald/30 text-vanta-emerald' : 'bg-vanta-black/20 border-black/5 text-[var(--text-muted)]'}`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${data.relay_fan ? 'bg-vanta-emerald shadow-[0_0_10px_#10b981]' : 'bg-slate-800'}`} />
                   <span className="text-[8px] sm:text-[9px] font-black tracking-widest uppercase">{data.relay_fan ? 'SPINNING' : 'IDLE'}</span>
                 </div>
               </div>
 
               <div className="mb-8 sm:mb-10 relative">
-                <h3 className="text-lg sm:text-xl font-black text-white mb-1 uppercase italic tracking-widest">FAN</h3>
-                <p className="text-slate-500 text-[9px] font-mono uppercase tracking-[0.2em]">System Cooling Unit</p>
+                <h3 className="text-lg sm:text-xl font-black mb-1 uppercase italic tracking-widest">FAN</h3>
+                <p className="text-[var(--text-muted)] text-[9px] font-mono uppercase tracking-[0.2em]">System Cooling Unit</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 relative">
                 <button
                   onClick={() => toggleDevice('fan', data.relay_fan ? 'auto' : 'on')}
-                  className={`py-4 rounded-md font-black uppercase text-[10px] tracking-widest transition-all font-mono border ${data.relay_fan ? 'bg-vanta-emerald text-white border-vanta-emerald shadow-[0_0_25px_rgba(16,185,129,0.5)]' : 'bg-white/5 text-slate-400 hover:bg-white/10 border-white/5'}`}
+                  className={`py-4 rounded-md font-black uppercase text-[10px] tracking-widest transition-all font-mono border ${data.relay_fan ? 'bg-vanta-emerald text-white border-vanta-emerald shadow-[0_0_25px_rgba(16,185,129,0.5)]' : 'vanta-button hover:text-vanta-emerald hover:border-vanta-emerald/30'}`}
                 >
                   {data.relay_fan ? 'AUTO_MODE' : 'FORCE_ON'}
                 </button>
                 <button
                   onClick={() => toggleDevice('fan', 'off')}
-                  className={`py-4 vanta-button font-mono text-slate-500 border border-white/5 hover:border-vanta-ruby/30 hover:text-vanta-ruby transition-all ${!data.relay_fan ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  className={`py-4 vanta-button font-mono text-[var(--text-muted)] hover:border-vanta-ruby/30 hover:text-vanta-ruby transition-all ${!data.relay_fan ? 'opacity-30 cursor-not-allowed' : ''}`}
                   disabled={!data.relay_fan}
                 >
                   HALT
@@ -362,7 +369,7 @@ export default function Dashboard({ espIp, setIsConnected }) {
           </div>
         </div>
 
-        {/* Sensor Array - Responsive Grid */}
+        {/* Sensor Array */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SensorCard
             title="Perimeter"
@@ -389,10 +396,10 @@ export default function Dashboard({ espIp, setIsConnected }) {
             status="Photon Intensity"
             icon={Sun}
             colorClass={getLightColor()}
-            isActive={data.light < 1000}
+            isActive={isLightPresent}
             value={data.light}
             subtext="LDR_ANLG"
-            progress={Math.min(100, (data.light / 1023) * 100)}
+            progress={Math.min(100, (data.light / 4095) * 100)}
           />
           <SensorCard
             title="Heartbeat"
@@ -400,13 +407,12 @@ export default function Dashboard({ espIp, setIsConnected }) {
             icon={Activity}
             colorClass="vanta-violet"
             isActive={!loading}
-            value="NOMINAL"
+            value={isConnected ? "NOMINAL" : "SYNCING"}
             subtext="ESP32_PULSE"
             progress={100}
           />
         </div>
       </div>
-
     </div>
   );
 }

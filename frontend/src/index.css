@@ -2,21 +2,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-vanta-black: #050505;
-  --color-vanta-surface: #0a0a0a;
+  --color-vanta-black: var(--vanta-black);
+  --color-vanta-surface: var(--vanta-surface);
   --color-vanta-violet: #8b5cf6;
   --color-vanta-emerald: #10b981;
   --color-vanta-ruby: #ef4444;
   --color-vanta-amber: #f59e0b;
-  --color-vanta-slate: #1e1e24;
+  --color-vanta-slate: var(--vanta-slate);
   
   --font-heading: 'Outfit', sans-serif;
   --font-mono: 'Space Grotesk', monospace;
 }
 
+:root {
+  --vanta-black: #050505;
+  --vanta-surface: #0a0a0a;
+  --vanta-slate: #1e1e24;
+  --text-main: #cbd5e1; /* slate-300 */
+  --text-muted: #64748b; /* slate-500 */
+  --panel-border: rgba(255, 255, 255, 0.05);
+  --panel-bg: rgba(10, 10, 10, 0.4);
+}
+
+.light {
+  --vanta-black: #f8fafc; /* slate-50 */
+  --vanta-surface: #ffffff;
+  --vanta-slate: #f1f5f9; /* slate-100 */
+  --text-main: #334155; /* slate-700 */
+  --text-muted: #64748b; /* slate-500 */
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --panel-bg: rgba(255, 255, 255, 0.7);
+}
+
 @layer base {
   body {
-    @apply bg-vanta-black text-slate-300 font-sans antialiased overflow-x-hidden;
+    @apply bg-vanta-black text-[var(--text-main)] font-sans antialiased overflow-x-hidden transition-colors duration-500;
     background-image: 
       radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 40%),
       radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
@@ -30,12 +50,15 @@
 
 @layer components {
   .vanta-panel {
-    @apply bg-vanta-surface/40 backdrop-blur-3xl border border-white/5 rounded-xl transition-all duration-500;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    @apply backdrop-blur-3xl border rounded-xl transition-all duration-500;
+    background-color: var(--panel-bg);
+    border-color: var(--panel-border);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
   }
   
   .vanta-button {
-    @apply px-6 py-3 bg-vanta-slate/50 hover:bg-vanta-violet/20 border border-white/5 rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all cursor-pointer disabled:opacity-50;
+    @apply px-6 py-3 bg-vanta-slate hover:bg-vanta-violet/20 border rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all cursor-pointer disabled:opacity-50;
+    border-color: var(--panel-border);
   }
 
   .neon-glow-violet {
