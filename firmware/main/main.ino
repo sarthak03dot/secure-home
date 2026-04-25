@@ -1,8 +1,10 @@
 
+
 #include <ESPmDNS.h>
 #include <WiFi.h>
 #include <WebServer.h>
 
+// const char* ssid = "free";
 const char* ssid = "Pradhanmantri";
 const char* password = "qprdst23";
 
@@ -82,6 +84,63 @@ bool isTriggered() {
 }
 
 // ===== AUTOMATION =====
+// void automation() {
+
+//   bool trigger = isTriggered();
+
+//   // ===== LDR FILTER =====
+//   static int filteredLight = 0;
+//   filteredLight = (filteredLight * 3 + lightValue) / 4;
+
+//   int darkThreshold = threshold;
+//   int lightThreshold = threshold + 500;
+
+//   static bool isDark = false;
+  
+
+//   // if (filteredLight > darkThreshold) {
+//   //   isDark = true;
+//   // } 
+//   // else if (filteredLight < lightThreshold) {
+//   //   isDark = false;
+//   // }
+//   if (filteredLight < darkThreshold) {
+//     isDark = true;
+//   } 
+//   else if (filteredLight > lightThreshold) {
+//     isDark = false;
+//   }
+//   // LIGHT (ONLY LDR BASED)
+//   if (!manualLight) {
+//     relayLight = isDark;
+//   }
+
+//   // FAN (trigger based)
+//   if (!manualFan) {
+//     relayFan = trigger;
+//   }
+
+//   // OUTPUT
+//   digitalWrite(RELAY1, relayLight ? LOW : HIGH);
+//   digitalWrite(RELAY2, relayFan ? LOW : HIGH);
+
+//   digitalWrite(LED_LIGHT, relayLight ? HIGH : LOW);
+//   digitalWrite(LED_FAN, relayFan ? HIGH : LOW);
+
+//   // BUZZER
+//   static unsigned long buzzTimer = 0;
+//   static bool buzzState = false;
+
+//   if (trigger) {
+//     if (millis() - buzzTimer > 300) {
+//       buzzTimer = millis();
+//       buzzState = !buzzState;
+//       digitalWrite(BUZZER, buzzState);
+//     }
+//   } else {
+//     digitalWrite(BUZZER, LOW);
+//   }
+// }
 void automation() {
 
   bool trigger = isTriggered();
@@ -95,36 +154,32 @@ void automation() {
 
   static bool isDark = false;
 
-  // if (filteredLight < darkThreshold) {
-  //   isDark = true;
-  // } 
-  // else if (filteredLight > lightThreshold) {
-  //   isDark = false;
-  // }
-  if (filteredLight > darkThreshold) {
+  //  CORRECT LOGIC (NO CHANGE NEEDED NOW)
+  if (filteredLight < darkThreshold) {
     isDark = true;
   } 
-  else if (filteredLight < lightThreshold) {
+  else if (filteredLight > lightThreshold) {
     isDark = false;
   }
-  // 💡 LIGHT (ONLY LDR BASED)
+
+  //  LIGHT (ONLY LDR BASED)
   if (!manualLight) {
     relayLight = isDark;
   }
 
-  // 🌀 FAN (trigger based)
+  //  FAN (trigger based)
   if (!manualFan) {
     relayFan = trigger;
   }
 
-  // OUTPUT
+  // 🔌 OUTPUT (Active LOW relay)
   digitalWrite(RELAY1, relayLight ? LOW : HIGH);
   digitalWrite(RELAY2, relayFan ? LOW : HIGH);
 
   digitalWrite(LED_LIGHT, relayLight ? HIGH : LOW);
   digitalWrite(LED_FAN, relayFan ? HIGH : LOW);
 
-  // BUZZER
+  //  BUZZER
   static unsigned long buzzTimer = 0;
   static bool buzzState = false;
 
@@ -137,8 +192,15 @@ void automation() {
   } else {
     digitalWrite(BUZZER, LOW);
   }
-}
 
+  //  DEBUG (VERY IMPORTANT)
+  Serial.print("LDR: ");
+  Serial.print(lightValue);
+  Serial.print(" | Filtered: ");
+  Serial.print(filteredLight);
+  Serial.print(" | isDark: ");
+  Serial.println(isDark);
+}
 // ===== API =====
 void handleData() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -220,12 +282,12 @@ void setup() {
     Serial.print(".");
   }
 
-  Serial.println("\n✅ WiFi Connected");
+  Serial.println("\n WiFi Connected");
 
   if (!MDNS.begin("secure-home")) {
-    Serial.println("❌ mDNS failed");
+    Serial.println(" mDNS failed");
   } else {
-    Serial.println("🌐 http://secure-home.local");
+    Serial.println(" http://secure-home.local");
   }
 
   Serial.print("IP: ");
@@ -249,7 +311,7 @@ void loop() {
   if (millis() - lastPrint > 1000) {
     lastPrint = millis();
 
-    Serial.println("\n📊 STATUS");
+    Serial.println("\n STATUS");
     Serial.print("Mode: "); Serial.println(detectMode);
     Serial.print("Motion: "); Serial.println(motion);
     Serial.print("Distance: "); Serial.println(distance);

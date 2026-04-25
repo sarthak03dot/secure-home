@@ -3,7 +3,8 @@ import dangerSound from "../assets/danger.mp3";
 import {
   Radar, Eye, Sun, Activity, Wind, Lightbulb,
   Terminal, AlertTriangle, Cpu, HardDrive, MousePointer2,
-  Power, ShieldAlert, Zap
+  Power, ShieldAlert, Zap,
+  Bell
 } from "lucide-react";
 
 const SensorCard = ({ title, status, icon: Icon, colorClass, isActive, value, subtext, progress = 0 }) => {
@@ -79,29 +80,38 @@ export default function Dashboard({ espIp, isConnected, setIsConnected }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAudioArmed, setIsAudioArmed] = useState(false);
   const audioRef = React.useRef(null);
 
   // Initialize Alarm System
   useEffect(() => {
-    audioRef.current = new Audio(dangerSound);
-    audioRef.current.loop = true;
-    audioRef.current.volume = 1.0;
+    const audio = new Audio(dangerSound);
+    audio.loop = true;
+    audio.volume = 1.0;
+    audioRef.current = audio;
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
   }, []);
 
   // Alarm Trigger Logic
   useEffect(() => {
     const isTriggered = (
       ((data.mode === 'pir' || data.mode === 'both') && data.motion) ||
-      ((data.mode === 'ultra' || data.mode === 'both') && data.distance > 0 && data.distance < 40)
+      ((data.mode === 'ultra' || data.mode === 'both') && data.distance > 0 && data.distance < 20)
     );
 
-    if (isTriggered && audioRef.current) {
-      audioRef.current.play().catch(e => console.warn("Audio autoplay blocked - interaction required"));
+    if (isTriggered && audioRef.current && isAudioArmed) {
+      audioRef.current.play().catch(e => {
+        console.warn("Audio blocked");
+        setIsAudioArmed(false);
+      });
     } else if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-  }, [data.motion, data.distance, data.mode]);
+  }, [data.motion, data.distance, data.mode, isAudioArmed]);
 
   const addLog = useCallback((type, value) => {
     setLogs(prev => {
@@ -186,12 +196,12 @@ export default function Dashboard({ espIp, isConnected, setIsConnected }) {
     }
   };
 
-  const isProximityAlert = data.distance > 0 && data.distance < 40;
+  const isProximityAlert = data.distance > 0 && data.distance < 20;
 
   // Manual Color Mapping for Hacker Theme
   const getMotionColor = () => data.motion ? 'vanta-red' : 'vanta-slate';
   const getProxColor = () => isProximityAlert ? 'vanta-red' : 'vanta-slate';
-  const isLightPresent = data.light < 1500;
+  const isLightPresent = data.light > 1500;
   const getLightColor = () => isLightPresent ? 'vanta-green' : 'vanta-slate';
 
   // Radar Proximity Mapping: Only show if within Trigger Zone (<40cm)
@@ -324,6 +334,25 @@ export default function Dashboard({ espIp, isConnected, setIsConnected }) {
               <p className="text-[var(--text-muted)] text-[9px] font-mono mt-1 sm:mt-2 tracking-[0.3em] uppercase">Manual Hardware Override</p>
             </div>
 
+            <button 
+              onClick={() => {
+                if (!isAudioArmed) {
+                  if (audioRef.current) {
+                    audioRef.current.play().then(() => {
+                      audioRef.current.pause();
+                      setIsAudioArmed(true);
+                    }).catch(e => console.error("Audio unlock failed", e));
+                  }
+                } else {
+                  setIsAudioArmed(false);
+                }
+              }}
+              className={`flex items-center gap-3 px-6 py-4 border-2 transition-all duration-500 font-mono text-[10px] font-black uppercase tracking-widest ${isAudioArmed ? 'bg-vanta-green/10 border-vanta-green text-vanta-green shadow-[0_0_20px_rgba(0,255,65,0.2)]' : 'bg-vanta-red/10 border-vanta-red text-vanta-red animate-pulse'}`}
+            >
+              <Bell className={`w-4 h-4 ${!isAudioArmed ? 'animate-bounce' : ''}`} />
+              {isAudioArmed ? 'DISARM_ALARM' : 'ARM_ALARM'}
+            </button>
+
             <div className="flex bg-black border-4 border-vanta-slate p-2 w-full lg:w-auto overflow-x-auto shadow-inner">
               {['pir', 'ultra', 'both', 'off'].map((m) => (
                 <button
@@ -335,6 +364,17 @@ export default function Dashboard({ espIp, isConnected, setIsConnected }) {
                   <span className="relative z-10">{m}</span>
                 </button>
               ))}
+              <button
+                onClick={() => toggleDevice('auto', 'on')}
+                className="flex-1 sm:flex-initial px-8 py-4 text-[11px] font-black uppercase tracking-[0.3em] transition-all font-mono border-x border-white/5 relative group text-vanta-green hover:bg-vanta-green/10"
+                title="Reset to Automatic Mode"
+              >
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 led-indicator led-green opacity-50" />
+                <span className="relative z-10 flex items-center gap-2">
+                   <Activity className="w-3 h-3" />
+                   AUTO
+                </span>
+              </button>
             </div>
           </div>
 
@@ -367,8 +407,7 @@ export default function Dashboard({ espIp, isConnected, setIsConnected }) {
                   </button>
                   <button
                     onClick={() => toggleDevice('light', 'off')}
-                    className="flex-1 tactile-bu
-                    tton group border-vanta-red/20 hatch-pattern"
+                    className="flex-1 tactile-button group border-vanta-red/20 hatch-pattern"
                   >
                     <div className={`led-indicator ${!data.relay_light ? 'led-red' : 'led-dim'}`} />
                     HALT_SYS

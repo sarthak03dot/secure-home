@@ -11,6 +11,7 @@ function App() {
   const [espIp, setEspIp] = useState(() => localStorage.getItem('espIp') || '');
   const [isConnected, setIsConnected] = useState(false);
   const [showSettings, setShowSettings] = useState(!espIp);
+  const [ipInput, setIpInput] = useState(espIp);
 
   useEffect(() => {
     document.documentElement.className = themeMode;
@@ -44,7 +45,7 @@ function App() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-xl sm:text-2xl font-black tracking-tighter italic uppercase vanta-hover-text">
-                  SECURE IOT <span className="text-vanta-green">HOME</span><span className="text-[var(--text-main)] transition-colors">SHIELD</span>
+                  MAKE MY <span className="text-vanta-green">HOME</span><span className="text-[var(--text-main)] transition-colors">SAFE</span>
                 </h1>
                 <div className="hidden xs:flex h-2 w-2 rounded-full bg-vanta-green animate-pulse" />
               </div>
@@ -114,11 +115,11 @@ function App() {
                 <div className="relative">
                   <input 
                     type="text" 
-                    defaultValue={espIp}
-                    onKeyDown={(e) => e.key === 'Enter' && saveIp(e.target.value)}
+                    value={ipInput}
+                    onChange={(e) => setIpInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveIp(ipInput)}
                     placeholder="192.168.1.XX"
                     className="w-full bg-vanta-black border-2 border-vanta-green/20 rounded-lg px-8 py-5 text-vanta-green font-mono text-sm focus:outline-none focus:border-vanta-green focus:shadow-[0_0_30px_rgba(0,255,65,0.2)] transition-all uppercase placeholder:opacity-30"
-                    id="ip-input"
                     autoFocus
                   />
                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-mono text-vanta-green opacity-40">IPv4</div>
@@ -132,7 +133,7 @@ function App() {
                   ABORT
                 </button>
                 <button 
-                  onClick={() => saveIp(document.getElementById('ip-input').value)}
+                  onClick={() => saveIp(ipInput)}
                   className="py-4 bg-vanta-green text-black font-black uppercase text-[10px] tracking-widest rounded-lg shadow-lg shadow-vanta-green/20 hover:shadow-vanta-green/40 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-mono italic"
                 >
                   ESTABLISH_LINK
