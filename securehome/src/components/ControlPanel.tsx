@@ -62,7 +62,7 @@ const ControlCard: React.FC<ControlCardProps> = ({
           ]}
         >
           <Text style={[styles.buttonText, { color: isActive ? '#fff' : COLORS.textDim }]}>
-            {isActive ? 'SET AUTO' : 'MANUAL ON'}
+            {isActive ? 'AUTO_MODE' : 'INIT_ON'}
           </Text>
         </TouchableOpacity>
         
@@ -70,7 +70,7 @@ const ControlCard: React.FC<ControlCardProps> = ({
           onPress={() => { triggerHaptic(); onForceOff(); }}
           style={[styles.actionButton, styles.offButton]}
         >
-          <Text style={styles.buttonText}>FORCE OFF</Text>
+          <Text style={styles.buttonText}>HALT_SYS</Text>
         </TouchableOpacity>
       </View>
     </View>

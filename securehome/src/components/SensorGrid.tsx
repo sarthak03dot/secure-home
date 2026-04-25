@@ -80,7 +80,7 @@ interface SensorGridProps {
 }
 
 const SensorGrid: React.FC<SensorGridProps> = ({ data }) => {
-  const isProximityAlert = data.distance > 0 && data.distance < 20;
+  const isProximityAlert = data.distance > 0 && data.distance < 40;
 
   return (
     <View style={styles.grid}>

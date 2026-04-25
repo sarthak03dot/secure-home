@@ -66,16 +66,35 @@ function App() {
     });
   }, []);
 
+  // URL Normalization for direct IP communication
+  const normalizeUrl = useCallback((url: string) => {
+    if (!url) return '';
+    let normalized = url.trim();
+    if (!normalized.startsWith('http')) {
+      normalized = `http://${normalized}`;
+    }
+    return normalized.replace(/\/+$/, '');
+  }, []);
+
   const fetchData = useCallback(async () => {
     if (!espIp) return;
+    const baseUrl = normalizeUrl(espIp);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
 
     try {
-      const response = await fetch(`${espIp}/data`, { signal: controller.signal });
+      const response = await fetch(`${baseUrl}/data`, { signal: controller.signal });
       const json = await response.json();
-      if (json.status === 'success') {
-        const newData = json.data;
+      
+      // Support for both wrapped {status, data} and direct root-level data
+      let newData = json.status === 'success' ? json.data : 
+                     (json.motion !== undefined ? json : null);
+
+      if (newData) {
+        // FIX: Invert relay_light because firmware/hardware uses Active-Low logic
+        if (newData.relay_light !== undefined) {
+          newData.relay_light = !newData.relay_light;
+        }
 
         // Log changes
         if (newData.motion !== data.motion) addLog('MOTION', newData.motion ? 'DETECTED' : 'CLEAR');
@@ -93,7 +112,7 @@ function App() {
     } finally {
       clearTimeout(timeoutId);
     }
-  }, [espIp, data, addLog]);
+  }, [espIp, data, addLog, normalizeUrl]);
 
   useEffect(() => {
     const interval = setInterval(fetchData, 1500);
@@ -101,8 +120,9 @@ function App() {
   }, [fetchData]);
 
   const handleControl = async (device: string, state: string) => {
+    const baseUrl = normalizeUrl(espIp);
     try {
-      await fetch(`${espIp}/relay?${device}=${state}`);
+      await fetch(`${baseUrl}/relay?${device}=${state}`);
       fetchData();
     } catch (error) {
       Alert.alert('Control Error', 'Failed to communicate with device');
@@ -110,8 +130,9 @@ function App() {
   };
 
   const handleModeChange = async (mode: string) => {
+    const baseUrl = normalizeUrl(espIp);
     try {
-      await fetch(`${espIp}/mode?type=${mode}`);
+      await fetch(`${baseUrl}/mode?type=${mode}`);
       fetchData();
     } catch (error) {
       Alert.alert('Mode Error', 'Failed to change mode');
@@ -124,7 +145,11 @@ function App() {
     setShowSettings(false);
   };
 
-  const isProximityAlert = data.distance > 0 && data.distance < 20;
+  const isProximityAlert = data.distance > 0 && data.distance < 40;
+  const isAlarmTriggered = (
+    ((data.mode === 'pir' || data.mode === 'both') && data.motion) ||
+    ((data.mode === 'ultra' || data.mode === 'both') && isProximityAlert)
+  );
 
   return (
     <SafeAreaProvider>
@@ -190,7 +215,7 @@ function App() {
                 <Text style={styles.modeIndicatorText}>{data.mode.toUpperCase()}</Text>
               </View>
             </View>
-            <RadarScanner isMotionDetected={data.motion} />
+            <RadarScanner isMotionDetected={isAlarmTriggered} />
             <View style={styles.radarStats}>
               <View style={styles.statBox}>
                 <Text style={styles.statLabel}>LATENCY</Text>
@@ -225,7 +250,7 @@ function App() {
         </ScrollView>
 
         {/* Security Overlay */}
-        {(data.motion || isProximityAlert) && (
+        {isAlarmTriggered && (
           <View style={styles.securityOverlay}>
             <View style={styles.alertIcon}>
               <AlertTriangle size={24} color="#fff" />
